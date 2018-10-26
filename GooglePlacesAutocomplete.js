@@ -226,7 +226,11 @@ export default class GooglePlacesAutocomplete extends Component {
 
   _onPress = (rowData) => {
     if (rowData.isJustUse) {
-      this.props.onPress(rowData, rowData);
+      let modifiedRowData = {
+        ...rowData,
+        description: this.state.text
+      };
+      this.props.onPress(modifiedRowData, modifiedRowData);
       return;
     }
     if (rowData.isPredefinedPlace !== true && this.props.fetchDetails === true) {
