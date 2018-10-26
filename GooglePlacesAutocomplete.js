@@ -112,7 +112,16 @@ export default class GooglePlacesAutocomplete extends Component {
       isPredefinedPlace: true
     }));
 
-    return [...res, ...results];
+    let justUseRes = [];
+    if (results.length === 0 || this.props.showJustUse === true) {
+      if (this.state.text !== "") {
+        justUseRes.push({
+          description: `Just use "${this.state.text}"`,
+          geometry: {location: {lat: null, lng: null}}
+        })
+      }
+    }
+    return [...res, ...results, ...justUseRes];
   }
 
   componentWillMount() {
@@ -762,7 +771,8 @@ GooglePlacesAutocomplete.propTypes = {
   suppressDefaultStyles: PropTypes.bool,
   numberOfLines: PropTypes.number,
   onSubmitEditing: PropTypes.func,
-  editable: PropTypes.bool
+  editable: PropTypes.bool,
+  showJustUse: PropTypes.bool,
 }
 GooglePlacesAutocomplete.defaultProps = {
   placeholder: 'Search',
@@ -808,7 +818,8 @@ GooglePlacesAutocomplete.defaultProps = {
   suppressDefaultStyles: false,
   numberOfLines: 1,
   onSubmitEditing: () => {},
-  editable: true
+  editable: true,
+  showJustUse: true
 }
 
 // this function is still present in the library to be retrocompatible with version < 1.1.0
