@@ -114,8 +114,9 @@ export default class GooglePlacesAutocomplete extends Component {
 
     let justUseRes = [];
     if (results.length === 0 || this.props.showJustUse === true) {
-      if (this.state.text !== "") {
+      if (this.state && this.state.text !== "") {
         justUseRes.push({
+          isJustUse: true,
           description: `Just use "${this.state.text}"`,
           geometry: {location: {lat: null, lng: null}}
         })
@@ -224,6 +225,10 @@ export default class GooglePlacesAutocomplete extends Component {
   }
 
   _onPress = (rowData) => {
+    if (rowData.isJustUse) {
+      this.props.onPress(rowData, rowData);
+      return;
+    }
     if (rowData.isPredefinedPlace !== true && this.props.fetchDetails === true) {
       if (rowData.isLoading === true) {
         // already requesting
@@ -420,11 +425,11 @@ export default class GooglePlacesAutocomplete extends Component {
             }
           }
           if (typeof responseJSON.error_message !== 'undefined') {
-              if(!this.props.onFail)
-                console.warn('google places autocomplete: ' + responseJSON.error_message);
-              else{
-                this.props.onFail(responseJSON.error_message)
-              }
+            if(!this.props.onFail)
+              console.warn('google places autocomplete: ' + responseJSON.error_message);
+            else{
+              this.props.onFail(responseJSON.error_message)
+            }
           }
         } else {
           // console.warn("google places autocomplete: request could not be completed or has been aborted");
@@ -449,7 +454,7 @@ export default class GooglePlacesAutocomplete extends Component {
 
       request.open('GET', url);
       if (this.props.query.origin !== null) {
-         request.setRequestHeader('Referer', this.props.query.origin)
+        request.setRequestHeader('Referer', this.props.query.origin)
       }
 
       request.send();
@@ -500,7 +505,7 @@ export default class GooglePlacesAutocomplete extends Component {
       };
       request.open('GET', 'https://maps.googleapis.com/maps/api/place/autocomplete/json?&input=' + encodeURIComponent(text) + '&' + Qs.stringify(this.props.query));
       if (this.props.query.origin !== null) {
-         request.setRequestHeader('Referer', this.props.query.origin)
+        request.setRequestHeader('Referer', this.props.query.origin)
       }
 
       request.send();
@@ -549,7 +554,7 @@ export default class GooglePlacesAutocomplete extends Component {
 
     return (
       <Text style={[{flex: 1}, this.props.suppressDefaultStyles ? {} : defaultStyles.description, this.props.styles.description, rowData.isPredefinedPlace ? this.props.styles.predefinedPlacesDescription : {}]}
-        numberOfLines={this.props.numberOfLines}
+            numberOfLines={this.props.numberOfLines}
       >
         {this._renderDescription(rowData)}
       </Text>
@@ -700,28 +705,28 @@ export default class GooglePlacesAutocomplete extends Component {
         pointerEvents="box-none"
       >
         {!this.props.textInputHide &&
-          <View
-            style={[this.props.suppressDefaultStyles ? {} : defaultStyles.textInputContainer, this.props.styles.textInputContainer]}
-          >
-            {this._renderLeftButton()}
-            <TextInput
-              ref="textInput"
-              editable={this.props.editable}
-              returnKeyType={this.props.returnKeyType}
-              autoFocus={this.props.autoFocus}
-              style={[this.props.suppressDefaultStyles ? {} : defaultStyles.textInput, this.props.styles.textInput]}
-              value={this.state.text}
-              placeholder={this.props.placeholder}
-              onSubmitEditing={this.props.onSubmitEditing}
-              placeholderTextColor={this.props.placeholderTextColor}
-              onFocus={onFocus ? () => {this._onFocus(); onFocus()} : this._onFocus}
-              clearButtonMode="while-editing"
-              underlineColorAndroid={this.props.underlineColorAndroid}
-              { ...userProps }
-              onChangeText={this._handleChangeText}
-            />
-            {this._renderRightButton()}
-          </View>
+        <View
+          style={[this.props.suppressDefaultStyles ? {} : defaultStyles.textInputContainer, this.props.styles.textInputContainer]}
+        >
+          {this._renderLeftButton()}
+          <TextInput
+            ref="textInput"
+            editable={this.props.editable}
+            returnKeyType={this.props.returnKeyType}
+            autoFocus={this.props.autoFocus}
+            style={[this.props.suppressDefaultStyles ? {} : defaultStyles.textInput, this.props.styles.textInput]}
+            value={this.state.text}
+            placeholder={this.props.placeholder}
+            onSubmitEditing={this.props.onSubmitEditing}
+            placeholderTextColor={this.props.placeholderTextColor}
+            onFocus={onFocus ? () => {this._onFocus(); onFocus()} : this._onFocus}
+            clearButtonMode="while-editing"
+            underlineColorAndroid={this.props.underlineColorAndroid}
+            { ...userProps }
+            onChangeText={this._handleChangeText}
+          />
+          {this._renderRightButton()}
+        </View>
         }
         {this._getFlatList()}
         {this.props.children}
